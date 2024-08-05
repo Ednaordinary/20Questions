@@ -81,6 +81,7 @@ public class Questions extends Application {
       String nextline = "";
       while (responsesScanner.hasNextLine()) {
         nextline = responsesScanner.nextLine();
+        if ()
         String answers = nextline.substring(0, 20);
         String thing = nextline.substring(20).strip();
         if (thing != "") {
@@ -134,7 +135,7 @@ public class Questions extends Application {
     Scene guessScene = new Scene(guessPane, 300, 300);
     EventHandler<ActionEvent> submithandler = e -> {
       boolean[] checked = new boolean[20];
-      Map<String, int> similarity = new HashMap<String, int>();
+      Map<String, Integer> similarity = new HashMap<String, Integer>();
       Arrays.fill(checked, false);
       for (int i = 0; i < boxes.length; i++) {
         if (boxes[i].isSelected()) {
@@ -144,17 +145,33 @@ public class Questions extends Application {
             System.out.println("false");
           }
         }
+      int thissimilarity;
       for (String thing : thingmap.keySet()) {
-        temp = thingmap.get(thing);
-        thissimilarity = 
-        for (int y = 0; y < temp.length; y++) {
-          if (temp[y] == checked[y]) {
-            
+        final int[] tempsim = thingmap.get(thing);
+        thissimilarity = 0;
+        for (int y = 0; y < tempsim.length; y++) {
+          if ((tempsim[y] != 0) == checked[y]) {
+            thissimilarity += 1;
           }
         }
-        thingmap.put(thing, temp);
+        thingmap.put(thing, tempsim);
+        similarity.put(thing, thissimilarity);
       }
+      String maxthing = "";
+      int maxsim = 0;
+      for (String thing : similarity.keySet()) {
+        if (similarity.get(thing) > maxsim) {
+          maxthing = thing;
+          maxsim = similarity.get(thing);
+        }
+      }
+      guess.setText(maxthing);
+      percent.setText(Integer.toString(maxsim*100) + "%");
       primaryStage.setScene(guessScene);
+    };
+    EventHandler<ActionEvent> backhandler = e -> {
+      FileWriter responsewriter = FileWriter()
+      primaryStage.setScene(questionsScene);
     };
     calculate.setOnAction(submithandler);
     primaryStage.setTitle("20 Questions");
