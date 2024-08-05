@@ -7,6 +7,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import java.util.Arrays;
 
 public class Questions extends Application {
   @Override
@@ -55,8 +58,24 @@ public class Questions extends Application {
     CheckBox q20 = new CheckBox("Does it have writing on it?");
     q20.setIndeterminate(false);
     Button calculate = new Button("Submit");
-    calculate.setOnAction(e -> calculateQuestions())
-    questionsBox.getChildren().addAll(q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, calculate);
+    CheckBox[] boxes = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20};
+    EventHandler<ActionEvent> submithandler = e -> {
+      boolean[] checked = new boolean[20];
+          Arrays.fill(checked, false);
+      for (int i = 0; i < boxes.length; i++) {
+        if (boxes[i].isSelected()) {
+            checked[i] = true;
+            System.out.println("true");
+          } else {
+            System.out.println("false");
+          }
+        }
+    };
+    calculate.setOnAction(submithandler);
+    for (int i = 0; i < boxes.length; i++) {
+      questionsBox.getChildren().addAll(boxes[i]);
+    };
+    questionsBox.getChildren().addAll(calculate);
     //Pane questionsPane = new Pane();
     //questionsPane.getChildren().addAll(questionsBox);
     BorderPane questionsPane = new BorderPane();
@@ -65,9 +84,6 @@ public class Questions extends Application {
     primaryStage.setTitle("20 Questions");
     primaryStage.setScene(questionsScene);
     primaryStage.show();
-  }
-  private void calculateQuestions() {
-    
   }
   public static void main(String[] args) {
   Application.launch(args);
