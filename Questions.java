@@ -6,17 +6,22 @@ import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
 import javafx.geometry.Pos;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.io.*;
 
 public class Questions extends Application {
   @Override
-  public void start(Stage primaryStage) {
+  public void start(Stage primaryStage) throws IOException {
     VBox questionsBox = new VBox();
     questionsBox.setSpacing(10);
     questionsBox.setAlignment(Pos.CENTER);
+    Label info = new Label("20 Questions");
     CheckBox q1 = new CheckBox("Is it alive?");
     q1.setIndeterminate(false);
     CheckBox q2 = new CheckBox("Is it real?");
@@ -70,8 +75,29 @@ public class Questions extends Application {
             System.out.println("false");
           }
         }
+      File responses = new File("responses.txt");
+      Map<String, int[]> thingmap = new HashMap<String, int[]>();
+      if (file.canRead()) {
+        Scanner responsesScanner = new Scanner(responses);
+        String nextline = "";
+        while (responsesScanner.hasNextLine()) {
+          nextline = responsesScanner.nextLine();
+          answers = nextline.substring(0, nextline.length(), 20);
+          thing = 
+          for (int x = 0; x < answers.length(); x++) {
+            if (answers.charAt(x) == '1') {
+              
+            } else {
+            
+            }
+          }
+        }
+      } else {
+        info.setText("Failed to read database!");
+      }
     };
     calculate.setOnAction(submithandler);
+    questionsBox.getChildren().addAll(info);
     for (int i = 0; i < boxes.length; i++) {
       questionsBox.getChildren().addAll(boxes[i]);
     };
