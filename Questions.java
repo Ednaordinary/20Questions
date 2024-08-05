@@ -16,6 +16,7 @@ import java.util.Scanner;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.io.*;
 
 public class Questions extends Application {
@@ -76,40 +77,63 @@ public class Questions extends Application {
     int[] zeros = new int[20];
     int[] temp = new int[20];
     Arrays.fill(zeros, 0);
+    System.out.println("1");
+    String thing;
     if (responses.canRead()) {
       Scanner responsesScanner = new Scanner(responses);
       String nextline = "";
       while (responsesScanner.hasNextLine()) {
         nextline = responsesScanner.nextLine();
-        if ()
-        String answers = nextline.substring(0, 20);
-        String thing = nextline.substring(20).strip();
-        if (thing != "") {
-          if (!thingmap.containsKey(thing)) {
-            thingmap.put(thing, zeros);
-          }
-          temp = thingmap.get(thing);
-          for (int x = 0; x < answers.length(); x++) {
-            if (answers.charAt(x) == '1') {
-              temp[x] += 1;
-            } else {
-              temp[x] -= 1;
+        if (nextline.strip() != "") {
+          String answers = nextline.substring(0, 20);
+          thing = nextline.substring(20).strip();
+          if (thing != "") {
+            if (!thingmap.containsKey(thing)) {
+              thingmap.remove(thing);
+              thingmap.put(thing, zeros);
             }
+            temp = thingmap.get(thing);
+            for (int x = 0; x < answers.length(); x++) {
+              if (answers.charAt(x) == '1') {
+                temp[x] += 1;
+              } else {
+                temp[x] -= 1;
+              }
+            }
+            thingmap.remove(thing);
+            thingmap.put(thing, temp);
+            System.out.println("2");
           }
-          thingmap.put(thing, temp);
         }
+      System.out.println("3");
       }
-      for (String thing : thingmap.keySet()) {
-        temp = thingmap.get(thing);
+      responsesScanner.close();
+      int keysize = thingmap.keySet().size();
+      Set<String> keymap = thingmap.keySet();
+      String[] keymaparray = keymap.toArray(new String[keysize]);
+      System.out.println("3-2");
+      String thisthing;
+      for (int h = 0; h < keymaparray.length; h++) {
+        System.out.println("4");
+        thisthing = keymaparray[h];
+        System.out.println("5-1");
+        temp = thingmap.get(thisthing);
         for (int y = 0; y < temp.length; y++) {
+          System.out.print("y");
+          System.out.println(y);
           if (temp[y] > 0) {
             temp[y] = 1;
           } else {
             temp[y] = 0;
           }
         }
-        thingmap.put(thing, temp);
+        System.out.println("5");
+        thingmap.remove(thisthing);
+        System.out.println("6");
+        thingmap.put(thisthing, temp);
+        System.out.println("7");
       }
+      System.out.println("8");
       if (thingmap.size() == 0) {
         info.setText("Database is empty!");
       }
@@ -121,8 +145,9 @@ public class Questions extends Application {
     Label percent = new Label("");
     Label prompt = new Label("What was it?");
     TextField correctthing = new TextField ();
-    Button goback = new Button("Go back");
-    guessBox.getChildren().addAll(guess, percent, prompt, correctthing, goback);
+    Button goback = new Button("Done");
+    Label guesserror = new Label("");
+    guessBox.getChildren().addAll(guess, percent, prompt, correctthing, goback, guesserror);
     for (int i = 0; i < boxes.length; i++) {
       questionsBox.getChildren().addAll(boxes[i]);
     };
@@ -133,50 +158,75 @@ public class Questions extends Application {
     guessPane.setCenter(guessBox);
     Scene questionsScene = new Scene(questionsPane, 300, 700);
     Scene guessScene = new Scene(guessPane, 300, 300);
+    boolean[] checked = new boolean[20];
+    Arrays.fill(checked, false);
     EventHandler<ActionEvent> submithandler = e -> {
-      boolean[] checked = new boolean[20];
       Map<String, Integer> similarity = new HashMap<String, Integer>();
-      Arrays.fill(checked, false);
       for (int i = 0; i < boxes.length; i++) {
         if (boxes[i].isSelected()) {
             checked[i] = true;
-            System.out.println("true");
           } else {
-            System.out.println("false");
           }
         }
       int thissimilarity;
-      for (String thing : thingmap.keySet()) {
-        final int[] tempsim = thingmap.get(thing);
+      int keysize = thingmap.keySet().size();
+      Set<String> keymap = thingmap.keySet();
+      String[] keymaparray = keymap.toArray(new String[keysize]);
+      for (String simthing : keymaparray) {
+        final int[] tempsim = thingmap.get(simthing);
         thissimilarity = 0;
         for (int y = 0; y < tempsim.length; y++) {
           if ((tempsim[y] != 0) == checked[y]) {
             thissimilarity += 1;
           }
         }
-        thingmap.put(thing, tempsim);
-        similarity.put(thing, thissimilarity);
+        thingmap.remove(simthing);
+        thingmap.put(simthing, tempsim);
+        similarity.put(simthing, thissimilarity);
       }
       String maxthing = "";
       int maxsim = 0;
-      for (String thing : similarity.keySet()) {
-        if (similarity.get(thing) > maxsim) {
-          maxthing = thing;
-          maxsim = similarity.get(thing);
+      keysize = similarity.keySet().size();
+      keymap = similarity.keySet();
+      keymaparray = keymap.toArray(new String[keysize]);
+      for (String thingmax : keymaparray) {
+        if (similarity.get(thingmax) > maxsim) {
+          maxthing = thingmax;
+          maxsim = similarity.get(thingmax);
         }
       }
       guess.setText(maxthing);
-      percent.setText(Integer.toString(maxsim*100) + "%");
+      percent.setText(Integer.toString(maxsim*5) + "%");
       primaryStage.setScene(guessScene);
     };
     EventHandler<ActionEvent> backhandler = e -> {
-      FileWriter responsewriter = FileWriter()
+      try {
+        FileWriter responsewriter = new FileWriter(responses, true);
+        responsewriter.write("\n");
+        String correctthingtext = correctthing.getText().strip();
+        if (correctthingtext != "") {
+          for (int n = 0; n < checked.length; n++) {
+            if (checked[n] == true) {
+              responsewriter.write("1");
+            } else {
+              responsewriter.write("0");
+            }
+          }
+          responsewriter.write(correctthingtext);
+          responsewriter.close();
+          primaryStage.close();
+        } else {
+          guesserror.setText("Text input should not be blank.");
+        }
+        } catch(IOException ex) {
+          guesserror.setText(ex.toString());
+        }
+      };
+      goback.setOnAction(backhandler);
+      calculate.setOnAction(submithandler);
+      primaryStage.setTitle("20 Questions");
       primaryStage.setScene(questionsScene);
-    };
-    calculate.setOnAction(submithandler);
-    primaryStage.setTitle("20 Questions");
-    primaryStage.setScene(questionsScene);
-    primaryStage.show();
+      primaryStage.show();
   }
   public static void main(String[] args) {
   Application.launch(args);
